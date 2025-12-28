@@ -881,6 +881,78 @@ footer::before {
                 </div>
 
                 <div class="form-group">
+                    <label for="category"><i class="fas fa-box-open"></i> نوع الشحنة (محتوى الطرد)</label>
+                    <div class="input-with-icon">
+               <select id="category">
+    <option value="">-- اختر نوع المحتوى بدقة --</option>
+    
+    <optgroup label="تجهيزات المنزل والأثاث">
+        <option>جهاز عرايس كامل</option>
+        <option>أدوات منزلية (رفايع مطبخ)</option>
+        <option>أجهزة كهربائية كبيرة (ثلاجة/غسالة)</option>
+        <option>أجهزة صغيرة (خلاط/مكواة/ميكروويف)</option>
+        <option>مفروشات (بطاطين/لحاف/ملايات)</option>
+        <option>سجاد وموكيت وستائر</option>
+        <option>نجف ونجف كريستال (حساس للكسر)</option>
+        <option>أثاث وموبيليا (فك وتركيب)</option>
+        <option>مراتب ومخدات</option>
+    </optgroup>
+
+    <optgroup label="الملابس والتجميل">
+        <option>ملابس جاهزة (بالات/كراتين)</option>
+        <option>أحذية وشنط جلديات</option>
+        <option>مستحضرات تجميل (مكياج)</option>
+        <option>عطور وأدوات عناية شخصية</option>
+        <option>إكسسوارات وساعات</option>
+        <option>أقمشة ومنسوجات (توابب)</option>
+    </optgroup>
+
+    <optgroup label="الإلكترونيات والكهرباء">
+        <option>موبايلات وإكسسواراتها</option>
+        <option>لابتوب وأجهزة كمبيوتر</option>
+        <option>شاشات تلفزيون (حساسة جداً)</option>
+        <option>كاميرات وأجهزة مراقبة</option>
+        <option>طابعات وأحبار وماكينات تصوير</option>
+        <option>أدوات كهربائية (سلوك/مفاتيح/لوحات)</option>
+        <option>رسيفرات وأجهزة استقبال</option>
+    </optgroup>
+
+    <optgroup label="الصناعة والورش والسباكة">
+        <option>قطع غيار سيارات (جديد)</option>
+        <option>قطع غيار استيراد (خردة)</option>
+        <option>إطارات وبطاريات سيارات</option>
+        <option>زيوت وشحومات وكيمياويات</option>
+        <option>عدد يدوية وماكينات ورش</option>
+        <option>دهانات ومواد بناء حديثة</option>
+        <option>أدوات سباكة (مواسير/خلاطات/أطقم حمام)</option>
+        <option>فلاتر مياه وقطع غيارها</option>
+    </optgroup>
+
+    <optgroup label="الصحة والغذاء">
+        <option>مواد غذائية (جافة/كراتين)</option>
+        <option>مستلزمات طبية وأجهزة قياس</option>
+        <option>أدوية ومكملات غذائية</option>
+        <option>منظفات ومطهرات (جالونات/كراتين)</option>
+        <option>عطارة وتوابل (شكاير/عبوات)</option>
+    </optgroup>
+
+    <optgroup label="مستلزمات متنوعة">
+        <option>مستندات وأوراق رسمية</option>
+        <option>كتب وأدوات مدرسية ومكتبية</option>
+        <option>لعب أطفال ودراجات</option>
+        <option>هدايا وورد صناعي</option>
+        <option>بلاستيكات وأدوات نظافة</option>
+        <option>أدوات صيد ومستلزمات بحر</option>
+        <option>أدوات رياضية وأجهزة جيم</option>
+        <option>أخرى - غير مصنف</option>
+    </optgroup>
+</select>
+
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="governorate"><i class="fas fa-map-marker-alt"></i> المحافظة</label>
                     <div class="input-with-icon">
                         <select id="governorate">
@@ -930,11 +1002,11 @@ footer::before {
                     <h3>📋 قائمة الشحنات</h3>
                     <div class="table-controls">
                         <div class="search-box">
-                            <input id="search" placeholder="ابحث برقم الشحنة أو الاسم" onkeyup="renderTable()">
+                            <input id="search" placeholder="ابحث برقم الشحنة أو الاسم" onkeyup="loadOrders()">
                             <i class="fas fa-search"></i>
                         </div>
                         <div class="input-with-icon">
-                            <select id="filter" onchange="renderTable()">
+                            <select id="filter" onchange="loadOrders()">
                                 <option value="الكل">الكل</option>
                                 <option value="صادرات">صادرات</option>
                                 <option value="واردات">واردات</option>
@@ -948,8 +1020,8 @@ footer::before {
                     <thead>
                         <tr>
                             <th>رقم الشحنة</th>
-                            <th>اسم العميل</th>
-                            <th>المحافظة</th>
+                            <th>العميل</th>
+                            <th>المحتوى</th> <th>المحافظة</th>
                             <th>النوع</th>
                             <th>المبلغ</th>
                             <th>حذف</th>
@@ -1011,145 +1083,44 @@ footer::before {
     </footer>
 
     <script>
-    let orders = JSON.parse(localStorage.getItem("orders") || "[]");
-
-    function save(){
-        localStorage.setItem("orders", JSON.stringify(orders));
+    // الدوال المساعدة (تنسيق المبالغ والتنبيهات)
+    function formatPrice(price) {
+        return new Intl.NumberFormat('ar-EG', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(price) + " ج.م";
     }
-
-    function addOrder(){
-        const order = {
-            id: orderId.value.trim(),
-            customer: customer.value.trim(),
-            governorate: governorate.value,
-            type: type.value,
-            price: parseFloat(price.value) || 0
-        };
-
-        if(!order.id || !order.customer || !order.governorate){
-            alert("من فضلك أكمل البيانات");
-            return;
-        }
-
-        orders.push(order);
-        save();
-        renderTable();
-
-        // Clear form with animation
-        orderId.value="";
-        customer.value="";
-        governorate.value="";
-        price.value="";
-        
-        // Show success message
-        showNotification("تم إضافة الشحنة بنجاح!", "success");
-    }
-
-    function deleteOrder(i){
-        if(confirm("هل تريد حذف الشحنة؟")){
-            orders.splice(i,1);
-            save();
-            renderTable();
-            showNotification("تم حذف الشحنة بنجاح!", "warning");
-        }
-    }
-
-    function renderTable(){
-        let tbody = document.getElementById("tableBody");
-        tbody.innerHTML = "";
-
-        let s = document.getElementById("search").value;
-        let f = document.getElementById("filter").value;
-
-        let exportSum = 0;
-        let importSum = 0;
-
-        orders
-        .filter(o =>
-            (f=="الكل" || o.type==f) &&
-            (o.id.includes(s) || o.customer.includes(s))
-        )
-        .forEach((o,i)=>{
-            // Calculate sums
-            if(o.type === 'صادرات') exportSum += o.price;
-            else if(o.type === 'واردات') importSum += o.price;
-
-            tbody.innerHTML += `
-            <tr>
-                <td><strong>${o.id}</strong></td>
-                <td>${o.customer}</td>
-                <td>${o.governorate}</td>
-                <td><span class="type-badge ${o.type === 'صادرات' ? 'type-export' : 'type-import'}">${o.type}</span></td>
-                <td><strong>${formatPrice(o.price)}</strong></td>
-                <td><button class="delete-btn" onclick="deleteOrder(${i})"><i class="fas fa-trash"></i> حذف</button></td>
-            </tr>`;
-        });
-
-        // Update financial summary
-        document.getElementById("totalExports").innerText = formatPrice(exportSum);
-        document.getElementById("totalImports").innerText = formatPrice(importSum);
-        document.getElementById("netProfit").innerText = formatPrice(exportSum - importSum);
-    }
-
-function formatPrice(price) {
-    return new Intl.NumberFormat('ar-EG', {
-        minimumFractionDigits: 0, // أقل عدد أرقام عشرية (خليناه صفر)
-        maximumFractionDigits: 0  // أقصى عدد أرقام عشرية (خليناه صفر)
-    }).format(price) + " ج.م";
-}
-
 
     function showNotification(message, type) {
-        // Create notification element
         const notification = document.createElement('div');
         notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            left: 20px;
+            position: fixed; top: 20px; left: 20px;
             background: ${type === 'success' ? '#198754' : '#dc3545'};
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            z-index: 10000;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            font-weight: bold;
+            color: white; padding: 15px 25px; border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10000;
+            transform: translateX(-100%); transition: transform 0.3s ease; font-weight: bold;
         `;
         notification.textContent = message;
         document.body.appendChild(notification);
-        
-        // Show notification
-        setTimeout(() => {
-            notification.style.transform = 'translateX(0)';
-        }, 100);
-        
-        // Hide and remove notification after 3 seconds
+        setTimeout(() => notification.style.transform = 'translateX(0)', 100);
         setTimeout(() => {
             notification.style.transform = 'translateX(-100%)';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
+            setTimeout(() => document.body.removeChild(notification), 300);
         }, 3000);
     }
 
-    // Initialize
+    // تهيئة رقم الشحنة التلقائي
     document.addEventListener('DOMContentLoaded', function() {
-        renderTable();
-        
-        // Add today's date as default order ID if empty
         const today = new Date();
-        const dateStr = today.getFullYear() + 
-                       String(today.getMonth() + 1).padStart(2, '0') + 
-                       String(today.getDate()).padStart(2, '0');
-        orderId.placeholder = `SH${dateStr}XXX`;
+        const dateStr = today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
+        document.getElementById('orderId').placeholder = `SH${dateStr}XXX`;
     });
     </script>
     
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import { 
-  getFirestore, collection, addDoc, getDocs, deleteDoc, doc 
+  getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy 
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1169,22 +1140,28 @@ const db = getFirestore(app);
 // =======================
 window.addOrder = async function () {
   const order = {
-    id: orderId.value.trim(),
-    customer: customer.value.trim(),
-    governorate: governorate.value,
-    type: type.value,
-    price: Number(price.value) || 0,
+    id: document.getElementById('orderId').value.trim(),
+    customer: document.getElementById('customer').value.trim(),
+    category: document.getElementById('category').value, // الحقل الجديد
+    governorate: document.getElementById('governorate').value,
+    type: document.getElementById('type').value,
+    price: Number(document.getElementById('price').value) || 0,
     createdAt: new Date()
   };
 
-  if (!order.id || !order.customer || !order.governorate) {
-    alert("من فضلك أكمل البيانات");
+  if (!order.id || !order.customer || !order.governorate || !order.category) {
+    alert("من فضلك أكمل كافة البيانات بما في ذلك نوع الشحنة");
     return;
   }
 
-  await addDoc(collection(db, "orders"), order);
-  clearForm();
-  loadOrders();
+  try {
+    await addDoc(collection(db, "orders"), order);
+    showNotification("تم إضافة الشحنة بنجاح!", "success");
+    clearForm();
+    loadOrders();
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
 };
 
 // =======================
@@ -1192,55 +1169,73 @@ window.addOrder = async function () {
 // =======================
 window.loadOrders = async function () {
   const tbody = document.getElementById("tableBody");
-  tbody.innerHTML = "";
+  const searchVal = document.getElementById("search").value.toLowerCase();
+  const filterVal = document.getElementById("filter").value;
+  
+  tbody.innerHTML = "<tr><td colspan='7'>جاري التحميل...</td></tr>";
 
   let exportSum = 0;
   let importSum = 0;
 
-  const snapshot = await getDocs(collection(db, "orders"));
+  try {
+    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
+    tbody.innerHTML = "";
 
-  snapshot.forEach(docSnap => {
-    const o = docSnap.data();
+    snapshot.forEach(docSnap => {
+      const o = docSnap.data();
+      
+      // تطبيق الفلترة والبحث
+      const matchesSearch = o.id.toLowerCase().includes(searchVal) || o.customer.toLowerCase().includes(searchVal);
+      const matchesFilter = filterVal === "الكل" || o.type === filterVal;
 
-    if (o.type === "صادرات") exportSum += o.price;
-    else importSum += o.price;
+      if (matchesSearch && matchesFilter) {
+        if (o.type === "صادرات") exportSum += o.price;
+        else importSum += o.price;
 
-    tbody.innerHTML += `
-      <tr>
-        <td>${o.id}</td>
-        <td>${o.customer}</td>
-        <td>${o.governorate}</td>
-        <td>${o.type}</td>
-        <td>${formatPrice(o.price)}</td>
-        <td>
-          <button class="delete-btn" onclick="deleteOrder('${docSnap.id}')">
-            حذف
-          </button>
-        </td>
-      </tr>
-    `;
-  });
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${o.id}</strong></td>
+            <td>${o.customer}</td>
+            <td><span style="color:#666; font-size:0.9rem">${o.category || 'غير محدد'}</span></td>
+            <td>${o.governorate}</td>
+            <td><span class="type-badge ${o.type === 'صادرات' ? 'type-export' : 'type-import'}">${o.type}</span></td>
+            <td><strong>${formatPrice(o.price)}</strong></td>
+            <td>
+              <button class="delete-btn" onclick="deleteOrder('${docSnap.id}')">
+                <i class="fas fa-trash"></i> حذف
+              </button>
+            </td>
+          </tr>
+        `;
+      }
+    });
 
-  totalExports.innerText = formatPrice(exportSum);
-  totalImports.innerText = formatPrice(importSum);
-  netProfit.innerText = formatPrice(exportSum - importSum);
+    document.getElementById("totalExports").innerText = formatPrice(exportSum);
+    document.getElementById("totalImports").innerText = formatPrice(importSum);
+    document.getElementById("netProfit").innerText = formatPrice(exportSum - importSum);
+  } catch (e) {
+    console.error("Error loading documents: ", e);
+  }
 };
 
 // =======================
 // حذف شحنة
 // =======================
 window.deleteOrder = async function (id) {
-  if (confirm("هل تريد حذف الشحنة؟")) {
+  if (confirm("هل تريد حذف الشحنة نهائياً؟")) {
     await deleteDoc(doc(db, "orders", id));
+    showNotification("تم حذف الشحنة بنجاح!", "warning");
     loadOrders();
   }
 };
 
 function clearForm() {
-  orderId.value = "";
-  customer.value = "";
-  governorate.value = "";
-  price.value = "";
+  document.getElementById('orderId').value = "";
+  document.getElementById('customer').value = "";
+  document.getElementById('category').value = "";
+  document.getElementById('governorate').value = "";
+  document.getElementById('price').value = "";
 }
 
 document.addEventListener("DOMContentLoaded", loadOrders);
