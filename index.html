@@ -159,7 +159,34 @@
 }
 
 .btn-login:hover { background: var(--primary-hover); transform: translateY(-2px); }
+    /* إخفاء الفوتر أثناء صفحة تسجيل الدخول */
+body.login-active footer {
+    display: none;
+}
 
+/* منع الاسكرول وقت تسجيل الدخول */
+body.login-active {
+    overflow: hidden;
+}
+    .login-success {
+    animation: zoomFade 0.6s ease forwards;
+}
+
+@keyframes zoomFade {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.1); }
+}
+.shake {
+    animation: shake 0.4s;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
     </style>
 </head>
 <body>
@@ -384,6 +411,21 @@
         function openWhatsAppPopup() { document.getElementById("waPopup").style.display = "flex"; }
         function closeWhatsAppPopup() { document.getElementById("waPopup").style.display = "none"; }
         window.closeModal = function() { document.getElementById("detailsModal").style.display = "none"; };
+    function loginSuccessAnimation() {
+    const screen = document.getElementById('login-screen');
+    screen.classList.add('login-success');
+
+    setTimeout(() => {
+        screen.style.display = 'none';
+        document.body.classList.remove('login-active');
+    }, 600);
+}
+    function shakeLogin() {
+    const card = document.querySelector('.login-card');
+    card.classList.remove('shake');
+    void card.offsetWidth;
+    card.classList.add('shake');
+}
     </script>
 
     <script type="module">
@@ -566,36 +608,41 @@
     // أضف هذه الدوال داخل السكريبت موديول (داخل type="module")
 
 window.checkLogin = function() {
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
+    const userInput = document.getElementById('username');
+    const passInput = document.getElementById('password');
     const errorMsg = document.getElementById('login-error');
 
-    // البيانات التي طلبتها
+    const user = userInput.value.trim();
+    const pass = passInput.value.trim();
+
+    // تنظيف الألوان
+    userInput.style.borderColor = '';
+    passInput.style.borderColor = '';
+    errorMsg.style.display = 'none';
+
+    if (!user || !pass) {
+        errorMsg.innerText = "من فضلك أدخل اسم المستخدم وكلمة المرور";
+        errorMsg.style.display = 'block';
+
+        if (!user) userInput.style.borderColor = 'var(--danger)';
+        if (!pass) passInput.style.borderColor = 'var(--danger)';
+        return;
+    }
+
     const correctUser = "elwaset";
     const correctPass = "30919900";
 
     if (user === correctUser && pass === correctPass) {
-        // حفظ حالة تسجيل الدخول في المتصفح
         localStorage.setItem('isLoggedIn', 'true');
-        document.getElementById('login-screen').style.display = 'none';
+        loginSuccessAnimation();
     } else {
+        errorMsg.innerText = "بيانات الدخول غير صحيحة";
         errorMsg.style.display = 'block';
-        errorMsg.classList.add('shake'); // يمكنك إضافة انيميشن اهتزاز
-    }
-};
 
-// التحقق من تسجيل الدخول عند تحميل الصفحة
-window.addEventListener('DOMContentLoaded', () => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (isLoggedIn === 'true') {
-        document.getElementById('login-screen').style.display = 'none';
+        userInput.style.borderColor = 'var(--danger)';
+        passInput.style.borderColor = 'var(--danger)';
+        shakeLogin();
     }
-});
-
-// إضافة زر تسجيل الخروج (اختياري)
-window.logout = function() {
-    localStorage.removeItem('isLoggedIn');
-    location.reload();
 };
 
     </script>
